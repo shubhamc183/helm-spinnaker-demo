@@ -1,0 +1,190 @@
+{
+  "keepWaitingPipelines": false,
+  "lastModifiedBy": "shubhamc183.com",
+  "limitConcurrent": true,
+  "spelEvaluator": "v4",
+  "stages": [
+    {
+      "account": "dev-webserver",
+      "cloudProvider": "kubernetes",
+      "expectedArtifacts": [
+        {
+          "defaultArtifact": {
+            "customKind": true,
+            "id": "62cc017c-216a-42fd-88ca-72405ef1bb7c"
+          },
+          "displayName": "DEV-Manifest",
+          "id": "23735e8a-b6b8-40a0-b58c-a6b04032e5b0",
+          "matchArtifact": {
+            "artifactAccount": "embedded-artifact",
+            "customKind": false,
+            "id": "29939dbc-261d-4007-a19c-d0cff372e35d",
+            "name": "ngninx123",
+            "type": "embedded/base64"
+          },
+          "useDefaultArtifact": false,
+          "usePriorArtifact": false
+        }
+      ],
+      "inputArtifacts": [
+        {
+          "account": "helm-charts",
+          "artifact": {
+            "artifactAccount": "helm-charts",
+            "id": "0ede950c-bc85-43ba-a9fc-7306b35fa0aa",
+            "name": "nginx",
+            "type": "helm/chart",
+            "version": "0.1.0"
+          }
+        },
+        {
+          "account": "public-github",
+          "artifact": {
+            "artifactAccount": "public-github",
+            "id": "fe5e65f7-982c-48cd-8078-67168e97d3a5",
+            "name": "values/dev.yaml",
+            "reference": "https://api.github.com/repos/shubhamc183/helm-spinnaker-demo/contents/values/dev.yaml",
+            "type": "github/file",
+            "version": "master"
+          }
+        }
+      ],
+      "moniker": {
+        "app": "nginx-demo"
+      },
+      "name": "Bake DEV Manifest",
+      "namespace": "",
+      "outputName": "ngninx123",
+      "overrides": {},
+      "refId": "1",
+      "requisiteStageRefIds": [],
+      "skipExpressionEvaluation": false,
+      "source": "artifact",
+      "templateRenderer": "HELM3",
+      "trafficManagement": {
+        "enabled": false,
+        "options": {
+          "enableTraffic": false,
+          "services": []
+        }
+      },
+      "type": "bakeManifest"
+    },
+    {
+      "expectedArtifacts": [
+        {
+          "defaultArtifact": {
+            "customKind": true,
+            "id": "f98e4dfc-27dc-498a-a9b8-aa4ad94f3cf5"
+          },
+          "displayName": "PROD-Manifest",
+          "id": "5c4de605-3596-481c-8ac1-d519bb6d04f4",
+          "matchArtifact": {
+            "artifactAccount": "embedded-artifact",
+            "customKind": false,
+            "id": "997a7970-8587-49c8-aae5-ae04f060935a",
+            "name": "nginx",
+            "type": "embedded/base64"
+          },
+          "useDefaultArtifact": false,
+          "usePriorArtifact": false
+        }
+      ],
+      "inputArtifacts": [
+        {
+          "account": "helm-charts",
+          "artifact": {
+            "artifactAccount": "helm-charts",
+            "id": "9b04e828-a887-400e-af9e-e1a8d6ff9cb5",
+            "name": "nginx",
+            "type": "helm/chart",
+            "version": "0.1.0"
+          }
+        },
+        {
+          "account": "public-github",
+          "artifact": {
+            "artifactAccount": "public-github",
+            "id": "36fe5154-0b11-4f50-990f-32e8f5dc6338",
+            "name": "values/prod.yaml",
+            "reference": "https://api.github.com/repos/shubhamc183/helm-spinnaker-demo/contents/values/prod.yaml",
+            "type": "github/file",
+            "version": "master"
+          }
+        }
+      ],
+      "name": "Bake PROD Manifest",
+      "namespace": "",
+      "outputName": "nginx",
+      "overrides": {},
+      "refId": "2",
+      "requisiteStageRefIds": [],
+      "templateRenderer": "HELM3",
+      "type": "bakeManifest"
+    },
+    {
+      "account": "dev-webserver",
+      "cloudProvider": "kubernetes",
+      "manifestArtifactId": "23735e8a-b6b8-40a0-b58c-a6b04032e5b0",
+      "moniker": {
+        "app": "nginx-demo"
+      },
+      "name": "Deploy to DEV",
+      "namespaceOverride": "webserver",
+      "refId": "3",
+      "requisiteStageRefIds": [
+        "1"
+      ],
+      "skipExpressionEvaluation": false,
+      "source": "artifact",
+      "trafficManagement": {
+        "enabled": false,
+        "options": {
+          "enableTraffic": false,
+          "services": []
+        }
+      },
+      "type": "deployManifest"
+    },
+    {
+      "failPipeline": true,
+      "instructions": "",
+      "judgmentInputs": [],
+      "name": "Deploy to PROD?",
+      "notifications": [],
+      "propagateAuthenticationContext": true,
+      "refId": "4",
+      "requisiteStageRefIds": [
+        "3",
+        "2"
+      ],
+      "type": "manualJudgment"
+    },
+    {
+      "account": "prod-webserver",
+      "cloudProvider": "kubernetes",
+      "manifestArtifactId": "5c4de605-3596-481c-8ac1-d519bb6d04f4",
+      "moniker": {
+        "app": "nginx-demo"
+      },
+      "name": "Deploy to PROD",
+      "namespaceOverride": "webserver",
+      "refId": "5",
+      "requisiteStageRefIds": [
+        "4"
+      ],
+      "skipExpressionEvaluation": false,
+      "source": "artifact",
+      "trafficManagement": {
+        "enabled": false,
+        "options": {
+          "enableTraffic": false,
+          "services": []
+        }
+      },
+      "type": "deployManifest"
+    }
+  ],
+  "triggers": [],
+  "updateTs": "1596044678000"
+}
